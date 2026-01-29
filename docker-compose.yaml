@@ -1,0 +1,25 @@
+services:
+  mcp:
+    image: python:3.11-slim
+    working_dir: /repo
+    volumes:
+      - ./:/repo
+    command: bash -lc "pip install -e '.[dev]' && python -m mcp.server"
+    ports:
+      - "8765:8765"
+    environment:
+      - MCP_PORT=8765
+      - MCP_CHAOS=0
+
+  api:
+    image: python:3.11-slim
+    working_dir: /repo
+    volumes:
+      - ./:/repo
+    command: bash -lc "pip install -e '.[dev]' && uvicorn app.main:app --host 0.0.0.0 --port 8000"
+    ports:
+      - "8000:8000"
+    environment:
+      - MCP_URL=http://mcp:8765
+    depends_on:
+      - mcp

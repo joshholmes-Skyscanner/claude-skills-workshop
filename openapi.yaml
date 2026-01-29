@@ -1,0 +1,13 @@
+openapi: 3.0.3
+info:
+  title: Orbital Travel Planner
+  version: 0.1.0
+paths:
+  /api/search:
+    post:
+      summary: Search for travel plans
+      requestBody:
+        required: true
+      responses:
+        '200':
+          description: OK
