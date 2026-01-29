@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Orbital Travel Planner</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <h1>Orbital Travel Planner</h1>
+
+      <section class="card">
+        <div class="row">
+          <label>Origin</label>
+          <input id="origin" value="LON" />
+        </div>
+
+        <div class="row">
+          <label>Destination</label>
+          <input id="destination" value="NYC" />
+        </div>
+
+        <div class="row">
+          <label>Depart After (ISO)</label>
+          <input id="depart_after" value="2026-02-01T08:00:00Z" />
+        </div>
+
+        <div class="row">
+          <label>Arrive Before (ISO)</label>
+          <input id="arrive_before" value="2026-02-02T08:00:00Z" />
+        </div>
+
+        <div class="row">
+          <label>Max Layovers</label>
+          <input id="max_layovers" type="number" value="2" />
+        </div>
+
+        <div class="row">
+          <label>Optimize For</label>
+          <select id="optimize_for">
+            <option value="balanced" selected>balanced</option>
+            <option value="fastest">fastest</option>
+            <option value="cheapest">cheapest</option>
+            <option value="greenest">greenest</option>
+          </select>
+        </div>
+
+        <button id="searchBtn">Search</button>
+
+        <details class="mt">
+          <summary>Request JSON</summary>
+          <pre id="requestPreview"></pre>
+        </details>
+      </section>
+
+      <section class="card">
+        <h2>Results</h2>
+        <div id="status" class="muted"></div>
+        <div id="results"></div>
+      </section>
+    </main>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>
