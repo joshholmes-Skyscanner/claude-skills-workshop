@@ -1,60 +1,73 @@
-# Advanced Claude Code Workshop
+# Advanced Claude Code Workshop: Meta-Programming & Skill Development
 
 **Duration:** 10:30–16:00 (lunch 12:00–13:00)
 **Audience:** Backend Python engineers familiar with Claude and LLM basics
-**Focus:** Planning-first workflows, multi-agent systems, MCP integrations, verification loops
+**Focus:** Custom skills, agent orchestration, self-validation loops, MCP tooling, meta-programming
 
-This codebase is intentionally incomplete. Use Claude Code to reason, plan, implement, test, and iterate.
-
----
-
-## Stage 1: Orientation & Constraints
-**Time:** 10:30–11:00 (30 min)
-
-**Goal:** Understand the system boundaries, existing code structure, and Claude Code's planning capabilities.
-
-**Tasks:**
-- Clone the repo and explore the structure using Claude Code's exploration agents
-- Ask Claude to identify what's implemented vs. what's missing
-- Run the existing backend and frontend to confirm baseline functionality
-- Review `pyproject.toml` and understand the MCP servers configured
-- Have Claude explain the intended architecture: what should be local vs. delegated to MCP
-
-**Success criteria:**
-- Backend runs on `localhost:8000`
-- Frontend connects and renders
-- You can articulate what the MCP servers are supposed to provide
-- You understand where the naive or incomplete implementations are
-
-**Hints:**
-- Use `/explore` or ask Claude to map the codebase before diving in
-- Check `README.md` for assumptions about MCP server behavior
+**Philosophy:** The orbital-travel-planner is a vehicle. The goal is to build reusable skills, validation harnesses, and agent coordination patterns you'll use daily after this workshop.
 
 ---
 
-## Stage 2: Planning & Orchestration
-**Time:** 11:00–12:00 (60 min)
+## Stage 1: Meta-Programming Foundation
+**Time:** 10:30–11:15 (45 min)
 
-**Goal:** Practice planning-first workflows and understand when to break tasks across multiple agents or phases.
+**Goal:** Understand how Claude Code's skill system works and create your first custom skill that orchestrates multiple agents.
 
 **Tasks:**
-- Implement a new endpoint: `POST /api/bookings` that accepts origin, destination, and date
-- Before coding, ask Claude to enter plan mode and propose an implementation strategy
-- The endpoint should validate inputs, call the MCP route provider, estimate pricing, and persist a booking
-- Deliberately introduce a constraint: bookings must check for duplicate routes within the same day
-- Ask Claude to reason about where validation belongs (API layer, service layer, database constraints)
-- Use Claude to coordinate backend changes, test additions, and schema updates in sequence
+- Explore the Claude Code skill architecture: where skills live, how they're invoked, how they compose
+- Create a custom skill `/validate-api` that:
+  - Spawns an Explore agent to find all API endpoints in the codebase
+  - Spawns a Plan agent to design a validation strategy
+  - Generates test cases for each endpoint
+  - Creates an MCP server that validates responses against OpenAPI schemas
+- Make the skill reusable: it should work on any FastAPI project, not just this one
+- Have the skill write its findings to a structured report that can be consumed by other agents
 
 **Success criteria:**
-- `/api/bookings` endpoint exists and returns structured JSON
-- Tests pass (or are written and pass)
-- You rejected at least one naive implementation in favor of a better-planned approach
-- You understand when Claude should pause to ask for your input vs. proceed autonomously
+- You can invoke `/validate-api` and it autonomously discovers, plans, and validates endpoints
+- The skill demonstrates agent-to-agent handoff (Explore → Plan → Execute)
+- You understand the skill manifest format and can explain how skills compose
+- You have a working MCP server that validates API responses
 
 **Hints:**
-- Use `EnterPlanMode` explicitly to see the planning workflow
-- If Claude generates code before planning, stop it and ask for a plan first
-- Consider: should duplicate detection be synchronous or async?
+- Skills are just structured prompts + tool permissions—study existing skills first
+- The skill should use `Task` tool to spawn specialized agents, not do everything inline
+- Consider: how does the Explore agent communicate findings to the Plan agent?
+- Look at MCP server examples for request/response validation patterns
+
+---
+
+## Stage 2: Self-Validating Systems
+**Time:** 11:15–12:00 (45 min)
+
+**Goal:** Build verification loops where Claude validates its own work using external tools and MCP servers.
+
+**Tasks:**
+- Create an MCP server that wraps Postman/Newman or similar API testing tool
+- The MCP server should:
+  - Accept endpoint definitions and expected responses
+  - Execute actual HTTP requests against running services
+  - Return structured pass/fail results with diffs
+- Create a skill `/implement-verified` that:
+  - Takes a feature description (e.g., "add pagination to bookings endpoint")
+  - Enters plan mode and proposes implementation
+  - Implements the feature
+  - Uses the validation MCP server to test the endpoint
+  - If validation fails, spawns a debugging agent to fix issues
+  - Loops until validation passes or max iterations reached
+- The skill should maintain a validation report showing iteration history
+
+**Success criteria:**
+- You have a working MCP server that validates HTTP endpoints
+- The `/implement-verified` skill demonstrates autonomous fix loops
+- Claude fixes at least one failing test without human intervention
+- You can explain the tradeoffs: when to loop vs. when to ask for help
+
+**Hints:**
+- The MCP server can shell out to `curl` or `httpx` for actual validation
+- Consider using contract testing (Pact/Dredd) patterns for validation
+- The skill needs to parse validation failures and form hypotheses about root causes
+- Think about guardrails: max iterations, degradation paths, when to escalate
 
 ---
 
@@ -63,144 +76,193 @@ This codebase is intentionally incomplete. Use Claude Code to reason, plan, impl
 
 ---
 
-## Stage 3: External Systems via MCP
+## Stage 3: Advanced Agent Orchestration
 **Time:** 13:00–14:00 (60 min)
 
-**Goal:** Integrate with MCP servers for routes, pricing, and emissions data. Handle failures gracefully.
+**Goal:** Create skills that coordinate multiple specialized agents in parallel and handle complex dependency graphs.
 
 **Tasks:**
-- Extend the `/api/bookings` endpoint to call all three MCP providers: routes, pricing, emissions
-- Simulate failure scenarios: one MCP server is slow, another returns errors intermittently
-- Implement retry logic with exponential backoff for transient failures
-- Add a `/api/bookings/{id}/status` endpoint that shows whether external data is still pending
-- Use Claude to reason about when to fail fast vs. degrade gracefully
-- Add observability: log MCP call durations and success rates
+- Create a skill `/chaos-test` that orchestrates multiple agents in parallel:
+  - Agent 1: Injects random failures into MCP servers (latency, errors, malformed data)
+  - Agent 2: Runs the booking flow repeatedly and logs failures
+  - Agent 3: Monitors logs and identifies failure patterns
+  - Agent 4: Proposes fixes based on failure analysis
+- The skill should:
+  - Use background agents (`run_in_background: true`) for long-running tasks
+  - Aggregate results from multiple agents using structured data (JSON)
+  - Create a dependency graph: Agent 4 waits for Agent 3's analysis
+  - Generate a final report with root cause analysis and proposed fixes
+- Implement at least one fix from the chaos testing and verify it resolves the issue
 
 **Success criteria:**
-- Booking flow calls all three MCP servers
-- Retries happen automatically for transient errors
-- Logs show MCP call outcomes
-- You can explain the tradeoffs between sync, async, and eventual consistency approaches
+- Four agents run concurrently (two in parallel, two with dependencies)
+- The skill aggregates findings from multiple agents into coherent recommendations
+- You identified and fixed a real concurrency or failure-handling bug
+- You can diagram the agent coordination flow and explain when to use parallel vs. sequential
 
 **Hints:**
-- MCP servers may be local scripts or stubs—check `mcp_servers/` directory
-- Consider: should you block the booking if one provider is down?
-- Use `TodoWrite` to break this into subtasks: integration, retry logic, observability
+- Use `TaskOutput` to retrieve results from background agents
+- Agents should write to structured files that other agents can read (JSON, not prose)
+- Consider using a "coordinator" agent that doesn't do work but orchestrates others
+- Think about how to make this skill generic—should work for any API project
 
 ---
 
-## Stage 4: Verification & Quality Gates
+## Stage 4: Daily Workflow Skills
 **Time:** 14:00–15:00 (60 min)
 
-**Goal:** Build automated verification that catches regressions and enforces invariants.
+**Goal:** Create practical, reusable skills for common engineering tasks beyond just coding.
 
 **Tasks:**
-- Add schema validation for all API responses using Pydantic models
-- Write integration tests that assert booking invariants (e.g., price > 0, date in future)
-- Introduce a failing test deliberately (e.g., negative pricing allowed) and ask Claude to fix the root cause
-- Add a pre-commit hook or CI step that runs tests and type-checking
-- Use Claude to identify edge cases: what happens if a route has no emissions data?
-- Implement a `/health` endpoint that checks MCP connectivity and returns degraded status if providers are down
+- Each participant picks one skill to build (or propose your own):
+  - **`/retro-prep`**: Analyzes git commits since last sprint, generates retro talking points, identifies patterns (what went well, what didn't)
+  - **`/pr-impact`**: Given a PR number, analyzes blast radius—what services/endpoints are affected, what tests need to run, what could break
+  - **`/onboard-service`**: Given a new service repo, generates architecture diagram, identifies dependencies, finds the "entry points", creates a dev setup checklist
+  - **`/incident-debrief`**: Given logs or error messages, generates a structured incident report with timeline, root cause, and prevention steps
+  - **`/debt-audit`**: Scans codebase for technical debt markers (TODO, FIXME, hardcoded values, missing tests), prioritizes by risk
+- The skill must:
+  - Work on any repo, not just this one
+  - Coordinate multiple agents or tools
+  - Produce structured output (markdown report, JSON, or diagram)
+  - Be parameterizable (e.g., `/retro-prep --since="2 weeks ago"`)
 
 **Success criteria:**
-- All API responses validate against Pydantic schemas
-- Tests cover happy path and at least three failure modes
-- You fixed a deliberately broken test by changing code, not the test
-- Health endpoint accurately reflects system state
+- Your skill is fully functional and tested on this repo
+- You've tested it on at least one other repo (can be from your work, with sanitized data)
+- The skill saves you >10 minutes vs. doing the task manually
+- You can explain how you'd install this skill in your daily Claude Code setup
 
 **Hints:**
-- Use `pytest` with fixtures to mock MCP responses
-- Ask Claude to generate property-based tests for invariants (e.g., pricing consistency)
-- Consider: should schema validation happen at serialization time or earlier?
+- Skills can call other skills—compose primitives
+- Use the Explore agent for broad codebase analysis, Grep/Glob for targeted searches
+- Consider using `AskUserQuestion` to make skills interactive when needed
+- Think about output format: can other tools consume your skill's output?
 
 ---
 
-## Stage 5: Creative Extension Sprint
+## Stage 5: MCP Server Development
 **Time:** 15:00–15:45 (45 min)
 
-**Goal:** Apply advanced patterns to a self-directed feature. Demonstrate multi-step reasoning and verification loops.
+**Goal:** Build a custom MCP server that extends Claude's capabilities for your domain.
 
 **Tasks:**
-- Choose one extension (or propose your own):
-  - **Multi-leg journeys:** Allow bookings with layovers, optimize for cost or emissions
-  - **Dynamic pricing:** Adjust prices based on demand, time-of-day, or inventory
-  - **Recommendation engine:** Suggest alternative routes if the requested one is unavailable
-  - **Admin dashboard:** Add endpoints to view all bookings, filter by status, export to CSV
-- Before implementing, ask Claude to:
-  - Propose multiple approaches and rank them by complexity, extensibility, and risk
-  - Identify which existing code will need refactoring
-  - Estimate how many files will change (no time estimates, just scope)
-- Implement the feature using Claude Code
-- Write tests and verify the feature works end-to-end
+- Create an MCP server that provides domain-specific tools for API development:
+  - `validate_endpoint`: Given OpenAPI spec, validates actual endpoint behavior
+  - `generate_test_data`: Creates realistic test data for schemas
+  - `compare_versions`: Diffs two API versions and identifies breaking changes
+  - `check_security`: Scans endpoints for common vulnerabilities (missing auth, CORS issues, etc.)
+- Integrate the MCP server into Claude Code's configuration
+- Create a skill that uses your MCP server to perform end-to-end API auditing
+- Test the skill on the orbital-travel-planner API
 
 **Success criteria:**
-- Feature is functional and tested
-- You chose an approach after weighing tradeoffs (not just the first idea)
-- Claude proposed a plan, you approved it, then implementation followed
-- You can explain one thing you would do differently with more time
+- Your MCP server implements at least 3 tools and responds correctly to MCP protocol messages
+- Claude Code can discover and invoke your MCP server's tools
+- A skill successfully uses your MCP server to audit the API
+- You can explain the MCP protocol: tool discovery, invocation, error handling
 
 **Hints:**
-- Use `AskUserQuestion` to clarify ambiguous requirements before Claude commits to an approach
-- If the feature requires external data, extend the MCP servers or mock them
-- Timebox ruthlessly—partially complete is fine if the architecture is sound
+- Study the MCP specification: server lifecycle, tool definition format, JSON-RPC transport
+- MCP servers can be written in Python—use `mcp` package or build from scratch
+- Consider: should tools be synchronous or async? What about long-running operations?
+- Think about error handling: how do you communicate failures to Claude?
 
 ---
 
-## Stage 6: Wrap-up & Reflection
+## Stage 6: Integration & Reflection
 **Time:** 15:45–16:00 (15 min)
 
-**Goal:** Consolidate learnings and identify patterns for advanced Claude Code usage.
+**Goal:** Integrate your skills into a cohesive workflow and plan post-workshop usage.
 
 **Tasks:**
-- Review the git diff for the day—how much code changed?
-- Ask Claude to summarize what it implemented and identify areas of technical debt
-- Discuss as a group:
-  - When did planning-first save time vs. slow you down?
-  - What kinds of tasks are best delegated to autonomous agents?
-  - How did MCP integrations compare to hardcoded logic?
-  - What verification gates caught real bugs vs. busywork?
+- Create a meta-skill `/full-audit` that composes the skills you've built:
+  - Runs API validation
+  - Executes chaos testing
+  - Performs security checks
+  - Generates a comprehensive report
+- Install your custom skills in your local Claude Code setup
+- Document each skill: purpose, parameters, example usage, known limitations
+- As a group, share the most useful skill created and demonstrate it
 
 **Success criteria:**
-- You can articulate 2–3 patterns for effective Claude Code usage
-- You identified at least one failure mode (yours or Claude's) and how to avoid it next time
+- You have 2-3 working custom skills installed locally
+- You can invoke them on different repos
+- You've documented how to share skills with your team
+- You can articulate when to build a skill vs. use an ad-hoc prompt
 
 **Hints:**
-- Use `git log --oneline` to see the commit history
-- Ask Claude: "What would you refactor if you had another hour?"
+- Skills can live in a shared repo—consider team distribution strategy
+- Use `git log --oneline` to see what you built today
+- Think about which skills need MCP servers vs. which work with existing tools
 
 ---
 
-## General Guidelines
+## Meta-Patterns to Internalize
 
-**Planning-first workflow:**
-- Prefer `EnterPlanMode` for any task touching >2 files or introducing new abstractions
-- Use `TodoWrite` to break complex tasks into trackable subtasks
-- When Claude proposes a solution, ask "what are the alternatives?" before proceeding
+### Agent Coordination
+- **Parallel agents**: Independent tasks (multiple file searches, concurrent tests)
+- **Sequential agents**: Output of one feeds another (Explore → Plan → Implement)
+- **Background agents**: Long-running tasks that don't block (chaos testing, log monitoring)
+- **Coordinator agents**: No work, just orchestration and aggregation
 
-**Multi-agent coordination:**
-- Use specialized agents (Explore, Plan, Test) rather than doing everything in the main loop
-- Run independent tasks in parallel when possible (e.g., multiple file searches)
+### Self-Validation Loops
+- **External validation**: MCP servers that run real tests (API calls, type checks, security scans)
+- **Fix-verify cycles**: Claude attempts fix → validates → fixes again if needed
+- **Guardrails**: Max iterations, confidence thresholds, escalation paths
+- **Structured feedback**: Parse failures into actionable hypotheses
 
-**Verification loops:**
-- Write tests before implementation when the requirements are clear
-- Use failing tests to drive fixes, not the other way around
-- Automate as much verification as possible (schemas, type-checking, integration tests)
+### Skill Design
+- **Composability**: Skills call other skills, tools, and agents
+- **Reusability**: Parameterize for different repos, contexts, and use cases
+- **Observability**: Log agent handoffs, decision points, and failures
+- **Graceful degradation**: Partial success is better than all-or-nothing
 
-**MCP integration patterns:**
-- Treat external systems as unreliable by default
-- Design for graceful degradation when providers are unavailable
-- Log, observe, and surface errors to users appropriately
+### MCP Server Patterns
+- **Tool granularity**: One focused thing vs. Swiss army knife
+- **Stateless preferred**: Each call is independent
+- **Rich errors**: Return structured diagnostics, not just "failed"
+- **Composable tools**: Tools that can be chained in sequences
 
-**Common pitfalls:**
-- Jumping into code without planning
-- Accepting the first solution without exploring tradeoffs
-- Writing tests that only validate happy paths
-- Hardcoding logic that should be configurable or delegated to MCP
+---
+
+## Post-Workshop: Taking Skills Home
+
+**Installation:**
+- Copy skills to `~/.claude/skills/` (or your team's shared skills repo)
+- Update Claude Code config to reference your MCP servers
+- Test skills on a different project to verify portability
+
+**Sharing with team:**
+- Document each skill's purpose, parameters, and example usage
+- Consider a team "skills registry" with contribution guidelines
+- Run internal demos to show patterns (not just "here's a tool")
+
+**Evolution:**
+- Start with narrow, high-value skills (e.g., `/retro-prep`)
+- Iterate based on usage: What's actually saving time?
+- Build MCP servers when skills need capabilities Claude doesn't have natively
+- Share learnings: When did agent orchestration help? When did it over-complicate?
 
 ---
 
 ## Resources
 
-- Claude Code docs: <https://github.com/anthropics/claude-code>
-- MCP specification: <https://modelcontextprotocol.io/>
-- This repo's README for baseline setup and MCP server behavior
+**Claude Code internals:**
+- Skill manifest format: `~/.claude/skills/*/skill.json`
+- Agent types and capabilities: Plan, Explore, Bash, general-purpose
+- Task tool parameters: `subagent_type`, `run_in_background`, `resume`
+
+**MCP development:**
+- Specification: <https://modelcontextprotocol.io/>
+- Python SDK: `pip install mcp`
+- Example servers: <https://github.com/modelcontextprotocol/servers>
+
+**Validation & testing:**
+- OpenAPI validation: `openapi-spec-validator`, `schemathesis`
+- Contract testing: Pact, Dredd
+- API testing: Postman/Newman, `httpx`, `requests`
+
+**Agent patterns:**
+- Background tasks: `run_in_background=true`, poll with `TaskOutput`
+- Structured output: Write JSON to files, agents read and process
+- Error recovery: Parse failures, form hypotheses, attempt fixes
