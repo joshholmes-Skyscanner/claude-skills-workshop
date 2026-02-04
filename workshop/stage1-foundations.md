@@ -89,93 +89,145 @@ The skill should activate and provide project context.
 - Ensure instructions are clear and actionable
 - Verify current directory has expected files
 
-## Part B: Agent Orchestration
+## Part B: Understanding Subagents
 
 **Time:** 10 minutes
 
-### Background: Agent Types
+### Background: What Are Subagents?
 
-Agents are specialized Claude instances for specific tasks:
+Subagents are specialized AI assistants that Claude delegates tasks to. Each runs in its own context window with:
+- Custom system prompt focused on specific tasks
+- Controlled tool access (can be read-only, write-only, etc.)
+- Independent permissions and context management
 
-- **Explore**: Codebase exploration and analysis
-- **Plan**: Architecture and implementation planning
-- **Bash**: Command execution specialist
-- **general-purpose**: Multi-step research and complex tasks
+**Why use subagents?**
+- Keep verbose output (test results, logs) out of your main conversation
+- Enforce constraints (read-only exploration, specific tool access)
+- Run tasks concurrently in the background
+- Preserve your main conversation context
 
-### 1. Spawn an Explore Agent
+### Built-in Subagents
 
-```
-Spawn an Explore agent to analyze the orbital-travel-planner codebase structure. Map:
-- Main application files
-- API endpoint locations
-- Database models
-- Frontend components
-```
+Claude Code includes several built-in subagents that Claude uses automatically:
 
-Observe Claude using the Task tool to spawn the agent.
+- **Explore**: Fast, read-only agent for searching and analyzing code (uses Haiku)
+- **Plan**: Research agent for gathering context during plan mode
+- **general-purpose**: Multi-step tasks requiring exploration and modification
+- **Bash**: Command execution in a separate context
 
-### 2. Spawn a Bash Agent
-
-While the Explore agent runs:
-
-```
-Spawn a Bash agent to check for tests in this project and run them
-```
-
-Both agents can run concurrently.
-
-### 3. Parallel Agent Execution
+### 1. View Available Subagents
 
 ```
-Spawn two agents in parallel:
-1. Explore agent to find all API endpoints
-2. Bash agent to check Python dependencies
+/agents
 ```
 
-Claude should send both Task calls in a single message.
+This opens an interactive interface showing:
+- All available subagents (built-in, user-level, and project-level)
+- Which subagents are active when duplicates exist
+- Options to create, edit, or delete custom subagents
 
-### 4. Background Execution
+### 2. Observe Automatic Delegation
 
-```
-Spawn a Bash agent in the background to run the full test suite with coverage reporting
-```
-
-Check progress:
-
-```
-Check the output of the background task
-```
-
-### 5. Agent Communication via Files
+Ask Claude to explore the codebase:
 
 ```
-1. Spawn an Explore agent to find all API endpoints and write results to api-endpoints.json
-2. After completion, spawn a general-purpose agent to read api-endpoints.json and generate test cases for each endpoint
+Analyze the orbital-travel-planner codebase structure and map out the main components
 ```
 
-Agents communicate through structured files, not conversation.
+Claude should automatically delegate to the **Explore** subagent. Notice:
+- The subagent indicator showing which agent is running
+- How the verbose exploration stays out of your main context
+- The summary that returns when the subagent completes
+
+### 3. Request Specific Subagents
+
+You can explicitly request a subagent:
+
+```
+Use the Explore agent to find all API endpoints in this project
+```
+
+### 4. Create a Custom Subagent
+
+Use the interactive interface:
+
+```
+/agents
+```
+
+Then:
+1. Select **Create new agent**
+2. Choose **Project-level** (saved to `.claude/agents/`)
+3. Select **Generate with Claude**
+4. Describe your subagent:
+   ```
+   A test analyzer that finds all test files, runs them, and reports only
+   failures with their error messages. Keep successful test output minimal.
+   ```
+5. Choose tools: Select **Bash** and **Read-only tools**
+6. Choose model: **Haiku** (fast and cost-effective)
+7. Pick a color and save
+
+### 5. Test Your Custom Subagent
+
+```
+Use the test-analyzer agent to check the test suite
+```
+
+Notice how only the relevant failure information returns, not the full test output.
+
+### 6. Background Execution
+
+Request a long-running task in the background:
+
+```
+In the background, run the full test suite with coverage reporting
+```
+
+You can continue working while it runs. Check progress:
+
+```
+/tasks
+```
 
 ### Verification
 
-- [ ] Successfully spawned an Explore agent
-- [ ] Successfully spawned a Bash agent
-- [ ] Executed multiple agents in parallel
-- [ ] Used TaskOutput to retrieve background task results
-- [ ] Understand when to use each agent type
+- [ ] Opened `/agents` interface and viewed available subagents
+- [ ] Observed Claude automatically delegating to Explore agent
+- [ ] Created a custom project-level subagent
+- [ ] Tested your custom subagent
+- [ ] Understand when subagents preserve context vs. main conversation
+
+### Key Concepts
+
+**When Claude uses subagents automatically:**
+- Verbose operations (running tests, processing logs)
+- Codebase exploration that doesn't need to be in main context
+- Tasks matching a custom subagent's description
+
+**When to use main conversation:**
+- Iterative refinement needing back-and-forth
+- Multiple phases sharing significant context
+- Quick, targeted changes where latency matters
+
+**Foreground vs. Background:**
+- **Foreground**: Blocks until complete, can prompt for permissions
+- **Background**: Runs concurrently, gets permissions upfront, auto-denies anything not pre-approved
 
 ### Troubleshooting
 
-**Agent times out:**
-- Break tasks into smaller chunks
-- Use background mode for long-running operations
+**Subagent doesn't activate:**
+- Check subagent description field - Claude uses it to decide when to delegate
+- Try explicitly requesting the subagent by name
+- Verify the subagent isn't in the `deny` list in settings
 
-**Agents don't run in parallel:**
-- Ensure tasks are independent
-- Verify Claude sent both Task calls in one message
+**Background task needs permissions:**
+- Claude prompts for permissions before launching background tasks
+- If it fails, you can resume it in foreground for interactive prompts
 
-**Cannot find agent output:**
-- Check for files agents created
-- Use correct task ID with TaskOutput
+**Can't find subagent output:**
+- Subagent summaries return to main conversation
+- Full transcripts are in `~/.claude/projects/{project}/{sessionId}/subagents/`
 
 ## Part C: MCP Server Configuration
 
