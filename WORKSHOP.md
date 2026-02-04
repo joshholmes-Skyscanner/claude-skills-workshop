@@ -12,7 +12,7 @@
 
 ---
 
-## 📚 New Modular Workshop Format!
+## Modular Workshop Format
 
 This workshop has been split into detailed, self-sufficient guides for each stage. Each guide includes:
 - Step-by-step instructions
