@@ -41,26 +41,17 @@ Analyzes git history to generate sprint retrospective talking points.
 
 ```bash
 mkdir -p ~/.claude/skills/retro-prep
-cd retro-prep
+cd ~/.claude/skills/retro-prep
 ```
 
-Create `skill.json`:
+Create `SKILL.md`:
 
-```json
-{
-  "name": "retro-prep",
-  "version": "1.0.0",
-  "description": "Analyzes sprint commits to generate retrospective talking points",
-  "author": "Your Name",
-  "invocation": "/retro-prep"
-}
-```
+```markdown
+---
+name: retro-prep
+description: Analyzes sprint commits to generate retrospective talking points. Use proactively before retrospective meetings.
+---
 
-#### Create the Prompt
-
-Create `prompt.txt`:
-
-```text
 You are a sprint retrospective preparation assistant generating insights from git history.
 
 PROCESS:
@@ -136,26 +127,17 @@ Analyzes PR to understand blast radius, affected systems, and testing requiremen
 
 ```bash
 mkdir -p ~/.claude/skills/pr-impact
-cd pr-impact
+cd ~/.claude/skills/pr-impact
 ```
 
-Create `skill.json`:
+Create `SKILL.md`:
 
-```json
-{
-  "name": "pr-impact",
-  "version": "1.0.0",
-  "description": "Analyzes pull request blast radius and generates review checklist",
-  "author": "Your Name",
-  "invocation": "/pr-impact"
-}
-```
+```markdown
+---
+name: pr-impact
+description: Analyzes pull request blast radius and generates review checklist. Use proactively when reviewing PRs or before merging.
+---
 
-#### Create the Prompt
-
-Create `prompt.txt`:
-
-```text
 You are a pull request impact analyzer assessing code change scope and risk.
 
 PROCESS:
@@ -302,7 +284,7 @@ You have now:
 ### Knowledge Check
 
 1. What makes a skill portable?
-2. When should you spawn agents vs. use direct tools?
+2. When should you delegate to subagents vs. use direct tools?
 3. How do you handle missing dependencies gracefully?
 4. What makes skill documentation effective?
 5. When is a skill worth building vs. one-off prompt?
