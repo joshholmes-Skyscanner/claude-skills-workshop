@@ -1,6 +1,6 @@
 # Showcase: Share What You Built
 
-**Time:** 60 minutes
+**Time:** 30 minutes
 **Goal:** Demonstrate your daily workflow skill and share learnings with the group
 
 ## Format
