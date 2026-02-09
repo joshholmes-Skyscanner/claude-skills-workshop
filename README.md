@@ -1,4 +1,4 @@
-# Orbital Travel Planner
+# Claude Skills Workshop
 
 A full-stack travel planning application with Python FastAPI backend, vanilla JavaScript frontend, and stateful booking system. This project demonstrates:
 - Multi-leg itinerary search and optimization
