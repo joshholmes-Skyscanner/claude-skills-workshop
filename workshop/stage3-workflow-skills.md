@@ -1,18 +1,24 @@
 # Stage 3: Daily Workflow Skills
 
-**Time:** 120 minutes
-**Goal:** Build practical skills for common engineering workflows
+**Time:** 90 minutes
+**Goal:** Create your own practical skill from scratch (freestyle exercise)
+
+## Important: This is a New Task
+
+**Stage 3 is independent from Stage 2.** This is not about fixing bugs found in chaos testing—this is a freestyle exercise where you build a workflow automation skill that solves a real engineering problem.
 
 ## Learning Objectives
 
-- Create real-world workflow automation
+- Create a skill tailored to your daily workflow
 - Make skills portable across repositories
 - Design for team distribution
-- Understand skill composition patterns
+- Apply orchestration patterns learned in Stage 2
 
 ## Overview
 
-Choose ONE skill to build from the options below. Focus on:
+**Choose ONE skill to build** from the options below, or propose your own. This is your chance to create something you'll actually use at work.
+
+Focus on:
 - **Portability**: Works on any repository
 - **Usefulness**: Saves >10 minutes vs. manual process
 - **Documentation**: Clear usage examples
@@ -20,13 +26,22 @@ Choose ONE skill to build from the options below. Focus on:
 
 ## Skill Options
 
+Pick one that matches a problem you face at work:
+
 ### Option 1: Sprint Retrospective Preparation
 ### Option 2: Pull Request Impact Analysis
-### Option 3: Service Onboarding Guide
-### Option 4: Incident Post-Mortem Generator
-### Option 5: Technical Debt Assessment
+### Option 3: Service Onboarding Guide (not included below - design your own)
+### Option 4: Incident Post-Mortem Generator (not included below - design your own)
+### Option 5: Technical Debt Assessment (not included below - design your own)
 
-Or propose your own workflow automation.
+**Or propose your own workflow automation** that would save you time:
+- Code review checklist generator
+- Architecture diagram creator
+- Breaking change detector
+- Test coverage analyzer
+- Deployment risk assessor
+
+The best skills solve problems you personally experience.
 
 ---
 

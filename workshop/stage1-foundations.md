@@ -12,8 +12,6 @@
 
 ## Part A: Create a Custom Skill
 
-**Time:** 10 minutes
-
 ### Background: Skills Overview
 
 Skills extend Claude Code with reusable commands. They inject specialized instructions into Claude's context when invoked.
@@ -24,14 +22,30 @@ Skills extend Claude Code with reusable commands. They inject specialized instru
 └── SKILL.md      # YAML frontmatter + instructions
 ```
 
-### 1. Create a New Skill Directory
+### 1. Understanding Skill Locations
+
+Skills can be stored at two levels:
+
+**User-level skills** (`~/.claude/skills/`):
+- Available across all projects
+- Good for general-purpose automation
+- Example: `/retro-prep`, `/pr-impact`
+
+**Project-level skills** (`.claude/skills/` in repo):
+- Specific to this project
+- Can be version-controlled and shared with team
+- Example: project-specific testing or deployment skills
+
+For this workshop, we'll create a **user-level skill** that works across projects.
+
+### 2. Create a New Skill Directory
 
 ```bash
 mkdir -p ~/.claude/skills/hello-skill
 cd ~/.claude/skills/hello-skill
 ```
 
-### 2. Create the Skill File
+### 3. Create the Skill File
 
 Create `SKILL.md`:
 
@@ -59,6 +73,14 @@ Use Read and Bash tools as needed. Keep responses under 100 words.
 **YAML frontmatter fields:**
 - `name`: Becomes the `/slash-command` (e.g., `/hello-skill`)
 - `description`: Helps Claude decide when to auto-load the skill
+
+**Want a project-level skill instead?**
+```bash
+# Create in project directory instead
+mkdir -p .claude/skills/hello-skill
+# Then add to git to share with team
+git add .claude/skills/hello-skill
+```
 
 ### 4. Test the Skill
 
@@ -90,8 +112,6 @@ The skill should activate and provide project context.
 - Verify current directory has expected files
 
 ## Part B: Understanding Subagents
-
-**Time:** 10 minutes
 
 ### Background: What Are Subagents?
 
@@ -229,116 +249,14 @@ You can continue working while it runs. Check progress:
 - Subagent summaries return to main conversation
 - Full transcripts are in `~/.claude/projects/{project}/{sessionId}/subagents/`
 
-## Part C: MCP Server Configuration
-
-**Time:** 10 minutes
-
-### Background: MCP Servers
-
-MCP (Model Context Protocol) servers extend Claude's capabilities with custom tools. They function as plugins providing new functions Claude can invoke.
-
-### 1. Review Existing Configuration
-
-```bash
-cat pyproject.toml
-```
-
-Look for the `[tool.claude.mcp]` section showing configured MCP servers.
-
-### 2. Understand MCP Structure
-
-An MCP server provides:
-- **Tools**: Functions Claude can invoke
-- **Parameters**: JSON Schema defining inputs
-- **Responses**: Structured return values
-
-### 3. Test the Existing MCP Server
-
-```
-Use the MCP server to validate the /api/destinations endpoint for a 200 status code
-```
-
-Claude should discover and invoke the configured MCP server tool.
-
-### 4. Add a New MCP Server
-
-Add the time MCP server as an example.
-
-Create or edit `~/.claude/config.json`:
-
-```json
-{
-  "mcpServers": {
-    "time": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-time"]
-    }
-  }
-}
-```
-
-Restart Claude Code to load the configuration.
-
-### 5. Test the New Server
-
-```
-Query the current time from the MCP time server
-```
-
-### 6. Review MCP Protocol
-
-```
-Explain how MCP servers communicate using the JSON-RPC protocol over stdio
-```
-
-Or fetch documentation:
-
-```
-Use WebFetch to retrieve and summarize the MCP protocol documentation from https://modelcontextprotocol.io
-```
-
-### Verification
-
-- [ ] Reviewed existing MCP server configuration
-- [ ] Tested orbital-travel-planner MCP server
-- [ ] Added new MCP server to configuration
-- [ ] Claude successfully invoked the new server
-- [ ] Understand MCP basics (tools, parameters, JSON-RPC)
-
-### Troubleshooting
-
-**MCP server not found:**
-- Verify config file syntax is valid JSON
-- Restart Claude Code after config changes
-- Check server command path is correct
-
-**Tool invocation fails:**
-- Verify parameter types match schema
-- Check server logs for errors
-- Ensure server process is running
-
-**Cannot locate config file:**
-- Check `~/.claude/config.json`
-- Ask Claude for config file location
-- Refer to Claude Code documentation
 
 ## Stage 1 Summary
 
 You have now:
 - Created a working custom skill
 - Spawned and coordinated different agent types
-- Added an MCP server to your configuration
 - Understood core Claude Code building blocks
 
-### Knowledge Check
-
-Before proceeding, ensure you can answer:
-
-1. Where do custom skills reside?
-2. What is the required file structure for a skill?
-3. What are the four main agent types?
-4. How do agents share data with each other?
-5. What protocol do MCP servers use?
 
 ### Advanced Exercises (Optional)
 
@@ -350,9 +268,6 @@ Create a three-agent workflow:
 1. Find all Python files
 2. Identify files without tests
 3. Generate test stubs for uncovered files
-
-**MCP Exploration:**
-Browse https://github.com/modelcontextprotocol/servers and add another server of interest.
 
 ---
 

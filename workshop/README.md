@@ -4,8 +4,7 @@ Build reusable skills and agent coordination patterns for daily use.
 
 ## Workshop Details
 
-- **Duration:** 5.5 hours (10:30–16:00, lunch 12:00–13:00)
-- **Target Audience:** Backend Python engineers familiar with Claude and LLM basics
+- **Duration:** 5.5 hours (10:30–15:00, lunch 12:00–13:00)
 - **Core Topics:** Custom skills, agent orchestration, MCP tooling, and practical daily workflow automation
 
 ## Learning Outcomes
@@ -41,16 +40,12 @@ Build a chaos testing skill with parallel and sequential agent coordination.
 
 ### Afternoon Session (13:00–16:00)
 
-**[Stage 2: CONT](./stage2-orchestration.md)** — 60 minutes (13:00–14:00)
 
-Build a chaos testing skill with parallel and sequential agent coordination.
-
-
-**[Stage 3: Daily Workflow Skills](./stage3-workflow-skills.md)** — 90 minutes (14:00–15:30)
+**[Stage 3: Daily Workflow Skills](./stage3-workflow-skills.md)** — 90 minutes (13:00–14:30)
 
 Build practical, reusable skills for common engineering tasks (sprint retros, PR analysis, code audits).
 
-**[Showcase: Share What You Built](./showcase.md)** — 30 minutes (15:30–16:00)
+**[Showcase: Share What You Built](./showcase.md)** — 30 minutes (14:30–15:00)
 
 Demo your skills and share learnings with the group.
 
